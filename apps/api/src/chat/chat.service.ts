@@ -5,10 +5,11 @@ import { RagService, RetrievedChunk } from '../rag/rag.service';
 import { ChatSource, ChatStreamEvent } from './chat-event';
 import { ChatMessageDto } from './dto/chat-request.dto';
 
-// Calibrated empirically against our OpenAI text-embedding-3-small + Pinecone cosine setup:
-// genuinely on-topic questions scored ~0.64-0.70, off-topic ones ~0.08-0.13. 0.5 sits well
-// clear of both.
-const DEFAULT_CONFIDENCE_THRESHOLD = 0.5;
+// Calibrated empirically against our OpenAI text-embedding-3-small + Pinecone cosine setup.
+// Specific questions score ~0.64-0.70; broad-but-legitimate ones ("tell me about accounts")
+// score lower, ~0.42-0.49, since they're less semantically specific than any single chunk.
+// Off-topic queries stay ~0.08-0.15 regardless of phrasing. 0.35 sits clear of both.
+const DEFAULT_CONFIDENCE_THRESHOLD = 0.35;
 const RETRIEVAL_K = 4;
 
 const ESCALATION_MESSAGE =
