@@ -11,6 +11,13 @@ import {
 } from '@ionic/angular/standalone';
 import { ChatService } from './chat.service';
 
+const SUGGESTED_QUESTIONS = [
+  'What happens if I overdraft my checking account?',
+  'How do I open a savings account?',
+  'What documents do I need for KYC?',
+  'What are your personal loan interest rates?',
+];
+
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.page.html',
@@ -26,6 +33,7 @@ export class ChatPage {
   readonly draft = signal('');
   readonly messages = this.chat.messages;
   readonly isStreaming = this.chat.isStreaming;
+  readonly suggestedQuestions = SUGGESTED_QUESTIONS;
   readonly showTypingIndicator = computed(() => {
     const msgs = this.messages();
     const last = msgs[msgs.length - 1];
@@ -45,10 +53,21 @@ export class ChatPage {
 
   async send(): Promise<void> {
     const value = this.draft();
-    if (!value.trim() || this.isStreaming()) {
-      return;
+    const submitted = await this.submit(value);
+    if (submitted) {
+      this.draft.set('');
     }
-    this.draft.set('');
+  }
+
+  async sendSuggestion(question: string): Promise<void> {
+    await this.submit(question);
+  }
+
+  private async submit(value: string): Promise<boolean> {
+    if (!value.trim() || this.isStreaming()) {
+      return false;
+    }
     await this.chat.sendMessage(value);
+    return true;
   }
 }

@@ -17,13 +17,13 @@ export class ChatController {
     res.flushHeaders();
 
     try {
-      for await (const chunk of this.chatService.streamReply(body.messages)) {
-        res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
+      for await (const event of this.chatService.streamReply(body.messages)) {
+        res.write(`data: ${JSON.stringify(event)}\n\n`);
       }
     } catch (err) {
-      this.logger.error('OpenAI stream failed', err instanceof Error ? err.stack : err);
+      this.logger.error('Chat stream failed', err instanceof Error ? err.stack : err);
       res.write(
-        `data: ${JSON.stringify({ error: 'Something went wrong. Please try again.' })}\n\n`,
+        `data: ${JSON.stringify({ type: 'error', error: 'Something went wrong. Please try again.' })}\n\n`,
       );
     } finally {
       res.write('data: [DONE]\n\n');

@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { ChatMessage } from './chat.models';
+import { ChatMessage, ChatStreamEvent } from './chat.models';
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
@@ -47,14 +47,14 @@ export class ChatService {
         }
       }
     } catch {
-      this.appendToLastMessage('\n\n⚠️ Something went wrong reaching the assistant. Please try again.');
+      this.updateLastMessage((msg) => ({ ...msg, content: msg.content + '\n\n⚠️ Something went wrong reaching the assistant. Please try again.' }));
     } finally {
       this.isStreaming.set(false);
     }
   }
 
-  private handleEvent(event: string): void {
-    const line = event.trim();
+  private handleEvent(rawEvent: string): void {
+    const line = rawEvent.trim();
     if (!line.startsWith('data:')) {
       return;
     }
@@ -64,19 +64,28 @@ export class ChatService {
       return;
     }
 
-    const parsed = JSON.parse(data) as { content?: string; error?: string };
-    if (parsed.error) {
-      this.appendToLastMessage(`\n\n⚠️ ${parsed.error}`);
-    } else if (parsed.content) {
-      this.appendToLastMessage(parsed.content);
+    const event = JSON.parse(data) as ChatStreamEvent;
+    switch (event.type) {
+      case 'sources':
+        this.updateLastMessage((msg) => ({ ...msg, sources: event.sources }));
+        break;
+      case 'content':
+        this.updateLastMessage((msg) => ({ ...msg, content: msg.content + event.content }));
+        break;
+      case 'escalate':
+        this.updateLastMessage((msg) => ({ ...msg, content: event.message, escalated: true }));
+        break;
+      case 'error':
+        this.updateLastMessage((msg) => ({ ...msg, content: msg.content + `\n\n⚠️ ${event.error}` }));
+        break;
     }
   }
 
-  private appendToLastMessage(chunk: string): void {
+  private updateLastMessage(updater: (message: ChatMessage) => ChatMessage): void {
     this.messages.update((msgs) => {
       const updated = [...msgs];
       const last = updated[updated.length - 1];
-      updated[updated.length - 1] = { ...last, content: last.content + chunk };
+      updated[updated.length - 1] = updater(last);
       return updated;
     });
   }
