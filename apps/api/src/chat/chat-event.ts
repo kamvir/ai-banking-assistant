@@ -3,13 +3,6 @@ export interface ChatSource {
   category: string;
 }
 
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-  sources?: ChatSource[];
-  escalated?: boolean;
-}
-
 export type ChatStreamEvent =
   | { type: 'sources'; sources: ChatSource[] }
   | { type: 'content'; content: string }

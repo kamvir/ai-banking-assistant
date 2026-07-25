@@ -18,3 +18,5 @@ services:
         sync: false
       - key: PINECONE_INDEX_NAME
         sync: false
+      - key: RAG_CONFIDENCE_THRESHOLD
+        value: 0.75

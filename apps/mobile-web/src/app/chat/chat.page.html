@@ -8,7 +8,17 @@
   <div class="message-list">
     @for (message of messages(); track $index) {
       <div class="message" [class.message--user]="message.role === 'user'" [class.message--assistant]="message.role === 'assistant'">
-        <div class="bubble">{{ message.content }}</div>
+        <div class="bubble-group">
+          <div class="bubble" [class.bubble--escalated]="message.escalated">{{ message.content }}</div>
+          @if (message.sources && message.sources.length > 0) {
+            <div class="sources">
+              <span class="sources__label">Sources</span>
+              @for (source of message.sources; track source.title) {
+                <span class="source-pill">{{ source.title }}</span>
+              }
+            </div>
+          }
+        </div>
       </div>
     }
 
