@@ -1,0 +1,29 @@
+## Dependencies
+node_modules/
+
+## Build output
+dist/
+www/
+.angular/
+
+## Environment
+.env
+.env.local
+*.env.local
+
+## Capacitor / mobile
+ios/
+android/
+.capacitor/
+
+## Logs
+*.log
+npm-debug.log*
+
+## Editor / OS
+.DS_Store
+.vscode/
+.idea/
+
+## Coverage
+coverage/
