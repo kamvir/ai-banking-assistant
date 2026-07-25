@@ -16,6 +16,27 @@ const ESCALATION_MESSAGE =
   'connect you with a human agent than guess. Please reach out to support@ourbank.example ' +
   'or call our helpline, and they can help from here.';
 
+const GREETING_RESPONSE =
+  'Hi there! I can help with questions about accounts, fees, KYC, and loans — what would you ' +
+  'like to know?';
+
+// Deliberately narrow and deterministic: small talk gets a canned, zero-risk reply with no LLM
+// call, so it never competes with the "never hallucinate a banking fact" guarantee below. A
+// message that doesn't match one of these still goes through retrieval + escalation as normal.
+const SMALL_TALK_PATTERNS = [
+  /^(hi|hello|hey|yo|howdy)[\s!.,]*$/i,
+  /^good\s*(morning|afternoon|evening)[\s!.,]*$/i,
+  /^(how are you|how's it going|what's up)[\s?!.,]*$/i,
+  /^(thanks|thank you|thx)[\s!.,]*$/i,
+  /^(bye|goodbye|see ya)[\s!.,]*$/i,
+  /^(what can you (do|help with)\??|who are you\??|what are you\??)$/i,
+];
+
+function isSmallTalk(message: string): boolean {
+  const trimmed = message.trim();
+  return SMALL_TALK_PATTERNS.some((pattern) => pattern.test(trimmed));
+}
+
 const SYSTEM_PROMPT = `You are a helpful assistant for a retail bank's customer-facing app.
 Answer the customer's question using ONLY the context provided below — do not use outside
 knowledge, and never invent numbers, fees, or policies that aren't in the context. If the
@@ -52,6 +73,11 @@ export class ChatService {
     const latestUserMessage = [...messages].reverse().find((message) => message.role === 'user');
     if (!latestUserMessage) {
       yield { type: 'escalate', message: ESCALATION_MESSAGE };
+      return;
+    }
+
+    if (isSmallTalk(latestUserMessage.content)) {
+      yield { type: 'content', content: GREETING_RESPONSE };
       return;
     }
 
