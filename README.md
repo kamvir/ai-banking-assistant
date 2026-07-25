@@ -42,7 +42,7 @@ This chunks each doc, embeds it with `text-embedding-3-small`, and upserts it in
 index — creating the index automatically as a serverless index if it doesn't exist yet. Requires
 `OPENAI_API_KEY`, `PINECONE_API_KEY`, and `PINECONE_INDEX_NAME` to be set in `apps/api/.env`.
 
-If a question's best-matching context falls below `RAG_CONFIDENCE_THRESHOLD` (default `0.75`),
+If a question's best-matching context falls below `RAG_CONFIDENCE_THRESHOLD` (default `0.5`),
 the assistant escalates to a "contact a human agent" message instead of guessing.
 
 ## Scripts (root)
