@@ -6,6 +6,15 @@
 
 <ion-content class="chat-content">
   <div class="message-list">
+    @if (messages().length === 0) {
+      <div class="suggestions">
+        <p class="suggestions__label">Try asking</p>
+        @for (question of suggestedQuestions; track question) {
+          <button type="button" class="suggestion-chip" (click)="sendSuggestion(question)">{{ question }}</button>
+        }
+      </div>
+    }
+
     @for (message of messages(); track $index) {
       <div class="message" [class.message--user]="message.role === 'user'" [class.message--assistant]="message.role === 'assistant'">
         <div class="bubble-group">

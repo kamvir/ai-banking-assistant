@@ -87,6 +87,43 @@
   color: var(--ion-color-dark, #222);
 }
 
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.suggestions__label {
+  margin: 0 0 4px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+.suggestion-chip {
+  font: inherit;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--ion-color-medium, #92949c);
+  background: var(--ion-color-light, #f4f5f8);
+  color: var(--ion-color-dark, #222);
+  cursor: pointer;
+  max-width: 100%;
+
+  &:hover {
+    background: var(--ion-color-light-shade, #e0e0e0);
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
 .typing-indicator {
   display: flex;
   align-items: center;
